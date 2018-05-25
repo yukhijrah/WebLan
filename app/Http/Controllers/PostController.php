@@ -1,10 +1,11 @@
 <?php
-
+ 
 namespace App\Http\Controllers;
-
+ 
 use Illuminate\Http\Request;
 use App\Post;
-
+use Session;
+ 
 class PostController extends Controller
 {
     /**
@@ -16,7 +17,7 @@ class PostController extends Controller
     {
         $this->middleware('auth');
     }
-
+ 
     /**
      * Display a listing of the resource.
      *
@@ -27,7 +28,7 @@ class PostController extends Controller
         $posts = Post::all();
         return view('posts.index', compact('posts'));
     }
-
+ 
     /**
      * Show the form for creating a new resource.
      *
@@ -37,7 +38,7 @@ class PostController extends Controller
     {
         return view('posts.create');
     }
-
+ 
     /**
      * Store a newly created resource in storage.
      *
@@ -46,23 +47,24 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $request->validate([
+        $request->validate ([
             'title' => 'required',
             'content' => 'required'
-            ]);
+        ]);
+ 
         $post = new Post();
-        $post ->title = $request->title;
-        $post ->content = $request ->content;
-        $post ->image = 'Image';
-        $post ->author = $request ->user()->name;
-        $post ->save();
-
-        if($post->save()) {
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->image = 'Image';
+        $post->author = $request->user()->name;
+        $post->save();
+ 
+        if($post->save()){
+            Session::flash('success','Post berhasil di buat');
             return redirect()->route('posts.index');
         }
     }
-
+ 
     /**
      * Display the specified resource.
      *
@@ -72,9 +74,9 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::find($id);
-        return view('posts.show', compact('post'));
+        return view('posts.show',compact('post'));
     }
-
+ 
     /**
      * Show the form for editing the specified resource.
      *
@@ -84,9 +86,9 @@ class PostController extends Controller
     public function edit($id)
     {
         $post = Post::find($id);
-        return view('posts.edit', compact('post'));
+        return view('posts.edit',compact('post'));
     }
-
+ 
     /**
      * Update the specified resource in storage.
      *
@@ -96,19 +98,22 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $request->validate ([
             'title' => 'required|max:255',
             'content' => 'required'
-            ]);
-
-        $post = Post::find($id);
-        $post->title= $request->title;
+        ]);
+ 
+        $post = new Post();
+        $post->title = $request->title;
         $post->content = $request->content;
+        $post->image = 'Image';
+        $post->author = 'test';
         $post->save();
-
+ 
         return redirect()->route('posts.index');
+       
     }
-
+ 
     /**
      * Remove the specified resource from storage.
      *
@@ -117,9 +122,10 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
+        //
         $post = Post::find($id);
         $post -> delete();
-
+ 
         return redirect()->route('posts.index');
     }
 }
